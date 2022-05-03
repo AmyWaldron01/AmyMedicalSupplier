@@ -1,21 +1,24 @@
 //Amy Waldron
 //G00395091
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
 
-//All The Structs
-
+//all The Structs
 //Details Of The Company
 typedef struct
 {
     //ints
     int regisNum;
-    int yearFounded;
+    int yearF;
     int numOfEmployees;
-    int data;//The Struct
-    int choiceOne, optionTwo;
+
+    //questions
+    int vatRegist;
+    int averageT;
+    int sector;
+    int numStaff;
 
     //chars
     char name[30];
@@ -23,171 +26,114 @@ typedef struct
     char email[30];
     char contactName[30];
 
-    //for questions
-    char regVat[5];
-    char averTurnOver[30];
-    char areaOfSales[30];
-    char numStaff[30];
-
     //floats
     float lastOrder;
-    float averAnnualOrder;
 
 }company;
 
-//Data 
-typedef struct
-{
-    int lessOneMil; 
-    int lessTenMil;
-    int overTenMil;
-    int choiceOne;
-    int options;
-}data;
-
-//Sign in
-typedef struct
-{
-    char signInName[20];
-    char password[20];
-}signIn;
-
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-//Functions
+//functions
 bool SignIn();
-void initArray(company* client, data statsGen);
-void Menu(company* client, data statsGen);
-void AddUser(company* client, data statsGen);
-void UpdateUser(company* client, data statsGen);
-void DeleteUser(company* client, data statsGen);
-void DisplayAllUsers(company* client, data statsGen);
-void DisplayUser(company* client, data statsGen);
-void MakeData(company* client, data statsGen);
-void ListUserLastAverTurnOver(company* client, data statsGen);
-void PrintDetsFile(company* client, data statsGen);
+void initArray(company* client);
+void Menu(company* client);
+void AddUser(company* client);
+void UpdateUser(company* client);
+void DeleteUser(company* client);
+void DisplayAllUsers(company* client);
+void DisplayUser(company* client);
+void MakeData(company* client);
+void ListUserLastAverTurnOver(company* client);
+void PrintDetsFile(company* client);
 
-
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
-//Main Method
+//main
 void main()
 {
-    //Declaring The Struct
-    company* client;
-    data statsGen;
-
-    //Setting Up The Array
-    client = (company*)malloc(100 * sizeof(company));
-
-    //Display
-    printf("\n\t\t*\t      XYX Medical Supplier Ltd       \t  *");
-    printf("\n \n");
-    //Variables
     bool signIn;
 
-    //Ask User to SignIn
+    //Declaring The Struct
+    company* client;
+
+    //Display
+    printf("\n\t\tXYX Medical Supplier Ltd\n\n");
+
+    //SignIn
     do {
         signIn = SignIn();
 
         if (signIn == true)
         {
-            printf("\n\n\n--------------------------------------");
-            printf("\n\t Correct Information entered!! \n");
-            printf("\n--------------------------------------");
+            printf("\n\nCorrect Information entered!! \n");
         }
 
         else
         {
-            printf("\n\n\n--------------------------------------");
-            printf("\n\t DENIED !!!\n");
-            printf("\n\t Wrong Inormation Enetered \n");
-            printf("\n\t Wrong UserName or Password \n");
-            printf("\n--------------------------------------\n\n");
+            printf("\n\nDENIED !!!\n");
+            printf("Wrong UserName or Password\n\n");
         }
     } while (signIn == false);
 
-    statsGen.options = 0;
+    //Setting Up The Array
+    client = (company*)malloc(50 * sizeof(company));
+    //Unsure how to ask user for size when also reading in old companies from file
+    //So i hardcoded it
 
     //Initalise  The Struct Array
-    initArray(client, statsGen);
+    initArray(client);
 
     //Menu
-    Menu(client, statsGen);
+    Menu(client);
 }
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
-//Initialize The Array And Print Data To File
-void initArray(company* client, data statsGen)
+//initialize array 
+void initArray(company* client)
 {
-    FILE* StoredInfo;
+    FILE* clientDetails;
 
-    //Set Array to -1
-    for (int i = 0; i < 100; i++)
+    //Set reg to -1
+    for (int i = 0; i < 50; i++)
     {
         (*(client + i)).regisNum = -1;
     }
 
     //Read into Array from file
-    StoredInfo = fopen("Clients.txt", "r");
+    clientDetails = fopen("Clients.txt", "r");
 
-    if (StoredInfo != NULL)
+    if (clientDetails == NULL)
     {
-        for (int j = 0; j < 100; j++)
+        printf("\nError reading file");
+    }
+    else
+    {
+        for (int clRead = 0; clRead < 50; clRead++)
         {
-            if ((*(client + j)).regisNum == -1)
-            { 
-                fscanf(StoredInfo, "%d %s %s %d %s ", &(*(client + j)).regisNum, &(*(client + j)).name, &(*(client + j)).country, &(*(client + j)).yearFounded, &(*(client + j)).email);
-                fscanf(StoredInfo, "%s %.2f %d %.2f ", &(*(client + j)).contactName, &(*(client + j)).lastOrder, &(*(client + j)).numOfEmployees, &(*(client + j)).averAnnualOrder);
-                fscanf(StoredInfo, "%s %s %s %s ", &(*(client + j)).regVat, &(*(client + j)).averTurnOver, &(*(client + j)).numStaff, &(*(client + j)).areaOfSales);
-                fscanf(StoredInfo, "%d %d %d\n", &(*(client + j)).data, &(*(client + j)).choiceOne, &(*(client + j)).optionTwo);
-          
-            
-                //when im reading in from file to set the struct at the start its only reading in one company and i have 3 in the text file 
-                
-                //I cant get this to work 
-                //this is how you do it though
-
-               /* create previous node = NULL
-                    create head node = NULL
-
-                    while (still have lines) {
-                        assign values to a new node
-                            new node->next = NULL
-
-                            if (head node == NULL) head node = new node
-                            else previous node->next = new node
-
-                                previous node = new node
-                    }*/
-            
+            if ((*(client + clRead)).regisNum == -1)
+            {
+                fscanf(clientDetails, "%d ", &(*(client + clRead)).regisNum);
+                fscanf(clientDetails, "%s ", &(*(client + clRead)).name);
+                fscanf(clientDetails, "%s ", &(*(client + clRead)).country);
+                fscanf(clientDetails, "%d ", &(*(client + clRead)).yearF);
+                fscanf(clientDetails, "%s ", &(*(client + clRead)).email);
+                fscanf(clientDetails, "%s ", &(*(client + clRead)).contactName);
+                fscanf(clientDetails, "%f ", &(*(client + clRead)).lastOrder);
+                fscanf(clientDetails, "%d ", &(*(client + clRead)).numOfEmployees);
+                fscanf(clientDetails, "%d ", &(*(client + clRead)).vatRegist);
+                fscanf(clientDetails, "%d ", &(*(client + clRead)).numStaff);
+                fscanf(clientDetails, "%d ", &(*(client + clRead)).averageT);
+                fscanf(clientDetails, "%d\n", &(*(client + clRead)).sector);
             }
         }
     }
-
 }
-
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
 
 //signIn
 bool SignIn()
 {
-    //Struct Varible
-    struct signIn* login1;
-
-    //Variables
     char signInName[30];
     char pass[30];
-    char UserNam[30];
-    char UserPass[30];
-   
+    char userName[30];
+    char userPass[30];
+
     int correctInfo = 0;
     int passwordLen = 0;
-    int endFile;
 
     //Askking the user for info
     printf("Please Enter Your Username: ");
@@ -207,10 +153,10 @@ bool SignIn()
     pass[passwordLen - 1] = '\0';
     getch();
 
-    //Getting the file
+    //File
     FILE* log;
 
-    //Opening the file
+    //Opening the file to read
     log = fopen("signIn.txt", "r");
 
     //Check if File Opened
@@ -218,21 +164,19 @@ bool SignIn()
         printf("\n 101 ERROR!\n");
         printf("!THE FILE CANNOT BE OPENED! \n");
     }
-    
+
     else
     {
-        endFile = getc(log);
-        
-        //printing out file info
-        while (correctInfo < 4)
+        //Checking Entered info with file info
+        while (correctInfo < 3)
         {
-            fscanf(log, "%s %s", UserNam, UserPass);
+            //Read in & Assign info
+            fscanf(log, "%s %s", userName, userPass);
 
-            printf("hello");
-            if (strcmp(UserNam, signInName) == 0)
+            //If Entered details are same as file
+            if (strcmp(userName, signInName) == 0)
             {
-                printf("hello");
-                if (strcmp(UserPass, pass) == 0)
+                if (strcmp(userPass, pass) == 0)
                 {
                     correctInfo = 5;
                 }
@@ -245,26 +189,17 @@ bool SignIn()
         {
             return true;
         }
-
-        else
-        {
-            return false;
-        }
     }
+    return false;
 }
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
 //Menu
-void Menu(company* client, data statsGen)
+void Menu(company* client)
 {
-    //Variables
     int options;
 
     //Display Menu
     printf("\n\n\t----- Main Menu -----");
-    printf("\nChoose an option");
     printf("\n1: Add Client\n2: Display All Client Details\n3: Display Client Details\n4: Update A Client Details\n5: Delete Client\n6: Generate Statics\n7. Print All Clients Details To File\n8. List Clients In Order of Average Turnover \n");
     printf("Other to Exit\n");
     printf("Chosen Option: ");
@@ -276,59 +211,51 @@ void Menu(company* client, data statsGen)
     switch (options)
     {
     case 1:
-        AddUser(client, statsGen);
+        AddUser(client);
         break;
     case 2:
-        DisplayAllUsers(client, statsGen);
+        DisplayAllUsers(client);
         break;
     case 3:
-        DisplayUser(client, statsGen);
+        DisplayUser(client);
         break;
     case 4:
-        UpdateUser(client, statsGen);
+        UpdateUser(client);
         break;
     case 5:
-        DeleteUser(client, statsGen);
+        DeleteUser(client);
         break;
     case 6:
-        MakeData(client, statsGen);
+        MakeData(client);
         break;
     case 7:
-        PrintDetsFile(client, statsGen);
+        PrintDetsFile(client);
         break;
     case 8:
-        ListUserLastAverTurnOver(client, statsGen);
+        ListUserLastAverTurnOver(client);
         break;
     default:
-        PrintDetsFile(client, statsGen);
+        PrintDetsFile(client);
         exit(0);
         break;
     }
 }
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
 //Option 1
 //Add User
-void AddUser(company* client, data statsGen)
+void AddUser(company* client)
 {
-    //Variables
     int currentUser;
-    int unique; 
+    int unique;
     int check;
-    int vat;
-    int averTurnover;
-    int numOfStaff;
-    int areaOfSales;
-    
+
     char email[30];
 
     //Look For Next Free Array Entry
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 50; i++)
     {
         if ((*(client + i)).regisNum == -1)
-        {  
+        {
             do
             {
                 //set to 0
@@ -339,24 +266,25 @@ void AddUser(company* client, data statsGen)
 
 
                 //Checking that number is unique
-                for (int j = 0; j < 100; j++)
+                for (int j = 0; j < 50; j++)
                 {
                     if (currentUser == (*(client + j)).regisNum)
                     {
+                        //Set Unique to -1 if reg already taken
                         unique = -1;
                     }
                 }
 
-               //not unique
+                //not unique
                 if (unique == -1)
                 {
                     printf("\n\n101 !!ERROR!!");
-                    printf("\nClient Reisgter Is Not Unique!!\n");
+                    printf("\nClient Register Is Not Unique!!\n");
                 }
 
                 else
                 {
-                   //when it is unique
+                    //when it is unique
                     (*(client + i)).regisNum = currentUser;
                 }
 
@@ -364,211 +292,285 @@ void AddUser(company* client, data statsGen)
 
             } while (unique == -1);
 
-            //The Company Name
-            printf("Please Enter Company Name: ");
+            //name
+            printf("Company name: ");
             scanf("%s", (*(client + i)).name);
 
-            //The Company Country
-            printf("Please Enter Companys Country: ");
+            //country
+            printf("Companys country of origin: ");
             scanf("%s", (*(client + i)).country);
 
-            //The Year Founded
-            printf("Please Enter Year Company was founded: ");
-            scanf("%d", &(*(client + i)).yearFounded);
+            //year founded
+            printf("Year company was founded: ");
+            scanf("%d", &(*(client + i)).yearF);
 
-            //The Company Email Address
+            //email
             do
             {
                 check = 0;
-                printf("Please Enter Company Email: ");
-                printf("\n (Insure to include @ + .com)\nEmail: ");
+                printf("\n (Insure to include @ + .com)\nCompany Email: ");
                 scanf("%s", email);
 
-                //is email unique and has correct format
+                //is email in correct format
                 if (strstr(email, "@") == NULL || strstr(email, ".com") == NULL)
                 {
                     printf("\n 101 !!ERROR!!");
-                    printf("\nPlease enter a @ and .com");
+                    printf("\nMake sure email is entered correctly");
                     check = -1;
                 }
             } while (check == -1);
 
             strncpy((*(client + i)).email, email, 30);
 
-            //Company Contact Name
-            printf("Please Enter Company Contact Name: ");
+            //contact name
+            printf("Company contact name: ");
             scanf("%s", &(*(client + i)).contactName);
 
-            //Last Order
-            printf("Please Enter Last Order Amount: ");
+            //last order
+            printf("Last order: ");
             scanf("%f", &(*(client + i)).lastOrder);
 
-            //Number of Employees
-            printf("Please Enter Number of Employees: ");
+            //employed
+            printf("Amount of employees: ");
             scanf("%d", &(*(client + i)).numOfEmployees);
 
-            //Average Annual Order
-            printf("Please Enter Average Annual Order: ");
-            scanf("%f", &(*(client + i)).averAnnualOrder);
+            //vat
+            printf("Are they vat registed? (1: Yes 2 : No)\nPlease Select : ");
+            scanf("%d", &(*(client + i)).vatRegist);
 
-            //Vat Registered
-            printf("Is the Client Vat Registered (1: Yes 2:No)\nPlease Select: ");
-            scanf("%d", &vat);
+            //turnover
+            printf("What is the average turnover? (1: Less than 1 Million 2: Less than 10 Million 3: Over 10 Million)\nPlease Select: ");
+            scanf("%d", &(*(client + i)).averageT);
 
-            //Client Average Turnover
-            printf("What are the Clients Average Turnover (1: Less than 1 Million 2: Less than 10 Million 3: Over 10 Million)\nPlease Select: ");
-            scanf("%d", &(*(client + i)).data);
-            averTurnover = (*(client + i)).data;
+            //employed
+            printf("How many are employed? (1: Less than 10 2: Less than 100 3: Over 100)\nPlease Select: ");
+            scanf("%d", &(*(client + i)).numStaff);
 
-            //Staff Employed
-            printf("How many numOfStaff are employed (1: Less than 10 2: Less than 100 3: Over 100)\nPlease Select: ");
-            scanf("%d", &(*(client + i)).optionTwo);
-            numOfStaff = (*(client + i)).optionTwo;
-
-            //Which Area of Sales is the company
-            printf("Which Area of Sales is the Company (1: ICT 2: Medical Devices 3: Other)\nPlease Select: ");
-            scanf("%d", &(*(client + i)).choiceOne);
-            areaOfSales = (*(client + i)).choiceOne;
-
-
-            //is The Vat Registered
-            if (vat == 1)
-            {
-                strncpy((*(client + i)).regVat, "Yes", 5);
-            }
-            else
-            {
-                strcpy((*(client + i)).regVat, "No", 5);
-            }
-
-            //Average Turnover
-            if (averTurnover == 1)
-            {
-                strncpy((*(client + i)).averTurnOver, "Less than 1 Mil", 30);
-            }
-            else if (averTurnover == 2)
-            {
-                strncpy((*(client + i)).averTurnOver, "Less than 10 Million", 30);
-            }
-            else
-            {
-                strncpy((*(client + i)).averTurnOver, "Over 10 Million", 30);
-            }
-
-            //Number Of Staff
-            if (numOfStaff == 1)
-            {
-                strncpy((*(client + i)).numStaff, "Less than 10", 30);
-            }
-            else if (numOfStaff == 2)
-            {
-                strncpy((*(client + i)).numStaff, "Less than 100", 30);
-            }
-            else
-            {
-                strncpy((*(client + i)).numStaff, "Over 100", 30);
-            }
-
-            //Area Of sales
-            if (areaOfSales == 1)
-            {
-                strncpy((*(client + i)).areaOfSales, "ICT", 30);
-            }
-            else if (areaOfSales == 2)
-            {
-                strncpy((*(client + i)).areaOfSales, "Medical Devices", 30);
-            }
-            else
-            {
-                strncpy((*(client + i)).areaOfSales, "Other ", 30);
-            }
+            //sector
+            printf("What sector is the company? (1: ICT 2: Medical Devices 3: Other)\nPlease Select: ");
+            scanf("%d", &(*(client + i)).sector);
 
             //Print to Screen
             printf("Success!");
-            printf("A New User has Added!");
+            printf("Taking you back to Menu");
 
             //Back to main menu
-            Menu(client, statsGen);
+            Menu(client);
         }
     }
 
 }
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
-
-// Option 2 
+//Option 2 
 //Display All User To SCreen
-void DisplayAllUsers(company* client, data statsGen)
+void DisplayAllUsers(company* client)
 {
-    for (int i = 0; i < 100; i++)
+    char vat[20], averageTurn[20], sector[20], numStaff[20];
+    int success = 0;
+
+    for (int i = 0; i < 50; i++)
     {
         if ((*(client + i)).regisNum != -1)
         {
-            //Print to screen
-            printf("\nClient Reg Number: %d\nName: %s\nCountry: %s", (*(client + i)).regisNum, (*(client + i)).name, (*(client + i)).country);
-            printf("\nLast Order: %.2f\nNumber of Employees: %d\nAverage Annual Order: %.2f", (*(client + i)).lastOrder, (*(client + i)).numOfEmployees, (*(client + i)).averAnnualOrder);
-            printf("\nYear Founded: %d\nEmail: %s\nContact Name: %s", (*(client + i)).yearFounded, (*(client + i)).email, (*(client + i)).contactName);
-            printf("\nVat Registered: %s\nAverage Turnover: %s\nStaff: %s\nArea: %s", (*(client + i)).regVat, (*(client + i)).averTurnOver, (*(client + i)).numStaff, (*(client + i)).areaOfSales);
+            success = 1;
+
+            //print
+            printf("\nRegister number: %d", (*(client + i)).regisNum);
+            printf("\nCompany name: %s", (*(client + i)).name);
+            printf("\nCountry based in: %s", (*(client + i)).country);
+            printf("\nLast order amount: %.2f", (*(client + i)).lastOrder);
+            printf("\nStaff employed: %d", (*(client + i)).numOfEmployees);
+            printf("\nYear company founded: %d", (*(client + i)).yearF);
+            printf("\nCompany contact email: %s", (*(client + i)).email);
+            printf("\nCompany contact Name: %s", (*(client + i)).contactName);
+
+            //vat
+            printf("\nIs company vat registered: ");
+            if ((*(client + i)).vatRegist == 1)
+            {
+                printf("Yes");
+            }
+            else
+            {
+                printf("No");
+            }
+
+            //turnover
+            printf("\nAverage turnover: ");
+            if ((*(client + i)).averageT == 1)
+            {
+                printf("Less than 1 Mil");
+            }
+            else if ((*(client + i)).averageT == 2)
+            {
+                printf("Less than 10 Million");
+            }
+            else
+            {
+                printf("Over 10 Million");
+            }
+
+            //employees
+            printf("\nStaff employed: ");
+            if ((*(client + i)).numStaff == 1)
+            {
+                printf("Less than 10");
+            }
+            else if ((*(client + i)).numStaff == 2)
+            {
+                printf("Less than 100");
+            }
+            else
+            {
+                printf("Over 100");
+            }
+
+            //sector
+            printf("\nCompany sector: ");
+            if ((*(client + i)).sector == 1)
+            {
+                printf("ICT");
+            }
+            else if ((*(client + i)).sector == 2)
+            {
+                printf("Medical Devices");
+            }
+            else
+            {
+                printf("Other");
+            }
+            printf("\n");
         }
     }
 
-    printf("\n Success!");
-    printf("\n All Users Have Been Displayed");
+    if (success > 0)
+    {
+        printf("\n\nSuccess!");
+    }
+    else
+    {
+        printf("\n\n!Error, no clients to display");
+    }
 
-    Menu(client, statsGen);
+    printf("\nTaking you back to Menu");
+
+    Menu(client);
 }
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
-
-// Option 3
+//Option 3
 //Display User
-void DisplayUser(company* client, data statsGen)
+void DisplayUser(company* client)
 {
     //Declare Variables
-    int reg;
+    int reg, success = 0;
+    char vat[20], averageTurn[20], sector[20], numStaff[20];
 
     //Asking user what company to display
-    printf("Please Enter The Reguster Number of Company you wish to Display: ");
+    printf("To display a company, enter its register number: ");
     scanf("%d", &reg);
 
     //find the one that matches
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 50; i++)
     {
         if ((*(client + i)).regisNum == reg)
         {
-            //print to screen
-            printf("\nClient Reg Number: %d\nName: %s\nCountry: %s", (*(client + i)).regisNum, (*(client + i)).name, (*(client + i)).country);
-            printf("\nYear Founded: %d\nEmail: %s\nContact Name: %s", (*(client + i)).yearFounded, (*(client + i)).email, (*(client + i)).contactName);
-            printf("\nLast Order: %,.2f\nNumber of Employees: %d\nAverage Annual Order: %,.2f", (*(client + i)).lastOrder, (*(client + i)).numOfEmployees, (*(client + i)).averAnnualOrder);
-            printf("\nVat Registered: %s\nAverage Turnover: %s\nStaff: %s\nArea: %s", (*(client + i)).regVat, (*(client + i)).averTurnOver, (*(client + i)).numStaff, (*(client + i)).areaOfSales);
+            success = 1;
+
+            //print
+            printf("\nRegister number: %d", (*(client + i)).regisNum);
+            printf("\nCompany name: %s", (*(client + i)).name);
+            printf("\nCountry based in: %s", (*(client + i)).country);
+            printf("\nLast order amount: %.2f", (*(client + i)).lastOrder);
+            printf("\nStaff employed: %d", (*(client + i)).numOfEmployees);
+            printf("\nYear company founded: %d", (*(client + i)).yearF);
+            printf("\nCompany contact email: %s", (*(client + i)).email);
+            printf("\nCompany contact Name: %s", (*(client + i)).contactName);
+
+            //vat
+            printf("\nIs company vat registered: ");
+            if ((*(client + i)).vatRegist == 1)
+            {
+                printf("Yes");
+            }
+            else
+            {
+                printf("No");
+            }
+
+            //turnover
+            printf("\nAverage turnover: ");
+            if ((*(client + i)).averageT == 1)
+            {
+                printf("Less than 1 Mil");
+            }
+            else if ((*(client + i)).averageT == 2)
+            {
+                printf("Less than 10 Million");
+            }
+            else
+            {
+                printf("Over 10 Million");
+            }
+
+            //employees
+            printf("\nStaff employed: ");
+            if ((*(client + i)).numStaff == 1)
+            {
+                printf("Less than 10");
+            }
+            else if ((*(client + i)).numStaff == 2)
+            {
+                printf("Less than 100");
+            }
+            else
+            {
+                printf("Over 100");
+            }
+
+            //sector
+            printf("\nCompany sector: ");
+            if ((*(client + i)).sector == 1)
+            {
+                printf("ICT");
+            }
+            else if ((*(client + i)).sector == 2)
+            {
+                printf("Medical Devices");
+            }
+            else
+            {
+                printf("Other");
+            }
+            printf("\n");
         }
     }
 
-    printf("\n Success!");
-    printf("\nUser is Displayed");
 
+    if (success > 0)
+    {
+        printf("\n\nSuccess!");
+    }
+    else
+    {
+        printf("\n\n!Error, no clients to display");
+    }
 
-    Menu(client, statsGen);
+    printf("\nTaking you back to Menu");
+
+    Menu(client);
 }
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
-// Option 4
+//Option 4
 // getting confused with adding User
 //Update User
-void UpdateUser(company* client, data statsGen)
+void UpdateUser(company* client)
 {
     //Declare Variables
-    int reg, check, vat, avTurn, numStaff, areaOfSales;
+    int reg, check;
     char email[30];
 
     //Ask User which Company to Update
-    printf("Please Enter Reg Number of Company you wish to Update: ");
+    printf("To update a company, enter its register number: ");
     scanf("%d", &reg);
 
     //Check for matching Reg
@@ -576,283 +578,188 @@ void UpdateUser(company* client, data statsGen)
     {
         if ((*(client + i)).regisNum == reg)
         {
-            //The Company Name
-            printf("Please Enter Company Name: ");
+            ///name
+            printf("Company name: ");
             scanf("%s", (*(client + i)).name);
 
-            //The Company Country
-            printf("Please Enter Companys Country: ");
+            //country
+            printf("Companys country of origin: ");
             scanf("%s", (*(client + i)).country);
 
-            //The Year Company Founded
-            printf("Please Enter Year Company was founded: ");
-            scanf("%d", &(*(client + i)).yearFounded);
+            //year founded
+            printf("Year company was founded: ");
+            scanf("%d", &(*(client + i)).yearF);
 
-           
-
+            //email
             do
             {
                 check = 0;
-                printf("Please Enter Company Email: ");
-                printf("\n (Insure to include @ + .com)\nEmail: ");
+                printf("\n (Insure to include @ + .com)\nCompany Email: ");
                 scanf("%s", email);
 
-                //is email unique and has correct format
+                //is email in correct format
                 if (strstr(email, "@") == NULL || strstr(email, ".com") == NULL)
                 {
                     printf("\n 101 !!ERROR!!");
-                    printf("\nPlease enter a @ and .com");
+                    printf("\nMake sure email is entered correctly");
                     check = -1;
                 }
             } while (check == -1);
 
             strncpy((*(client + i)).email, email, 30);
 
-            //Company Contact Name
-            printf("Please Enter Company Contact Name: ");
+            //contact name
+            printf("Company contact name: ");
             scanf("%s", &(*(client + i)).contactName);
 
-            //Number Staff Employed
-            printf("How many Staff are employed (1: Less than 10 2: Less than 100 3: Over 100)\nPlease Pick An Option: ");
-            scanf("%d", &(*(client + i)).optionTwo);
-            numStaff = (*(client + i)).optionTwo;
-
-            //Last Order
-            printf("Please Enter Last Order Amount: ");
+            //last order
+            printf("Last order: ");
             scanf("%f", &(*(client + i)).lastOrder);
 
-            //Number of Employees
-            printf("Please Enter Number of Employees: ");
+            //employed
+            printf("Amount of employees: ");
             scanf("%d", &(*(client + i)).numOfEmployees);
 
-            //Client Average Turnover
-            printf("What are the Clients Average Turnover (1: Less than 1 Million 2: Less than 10 Million 3: Over 10 Million)\nPlease Pick An Option: ");
-            scanf("%d", &(*(client + i)).data);
-            avTurn = (*(client + i)).data;
+            //vat
+            printf("Are they vat registed? (1: Yes 2 : No)\nPlease Select : ");
+            scanf("%d", &(*(client + i)).vatRegist);
 
-            //Average Annual Order
-            printf("Please Enter Average Annual Order: ");
-            scanf("%f", &(*(client + i)).averAnnualOrder);
+            //turnover
+            printf("What is the average turnover? (1: Less than 1 Million 2: Less than 10 Million 3: Over 10 Million)\nPlease Select: ");
+            scanf("%d", &(*(client + i)).averageT);
 
-            //Which Area of Sales is the company
-            printf("Which Area of Sales is the Company (1: ICT 2: Medical Devices 3: Other)\nPlease Pick An Option: ");
-            scanf("%d", &(*(client + i)).choiceOne);
-            areaOfSales = (*(client + i)).choiceOne;
+            //employed
+            printf("How many are employed? (1: Less than 10 2: Less than 100 3: Over 100)\nPlease Select: ");
+            scanf("%d", &(*(client + i)).numStaff);
 
-            //Vat Registered
-            printf("Is the Client Vat Registered (1: Yes 2:No)\nPlease Pick An Option: ");
-            scanf("%d", &vat);
-   
+            //sector
+            printf("What sector is the company? (1: ICT 2: Medical Devices 3: Other)\nPlease Select: ");
+            scanf("%d", &(*(client + i)).sector);
 
             //////////////////////////////////////////////////////
             //basically same as adding user
 
-            //Is Vat Regitered
-            if (vat == 1)
-            {
-                strncpy((*(client + i)).regVat, "Yes", 5);
-            }
-            else
-            {
-                strcpy((*(client + i)).regVat, "No", 5);
-            }
-
-
-            //Number OF Staff
-            if (numStaff == 1)
-            {
-                strncpy((*(client + i)).numStaff, "Less than 10", 25);
-            }
-            else if (numStaff == 2)
-            {
-                strncpy((*(client + i)).numStaff, "Less than 100", 25);
-            }
-            else
-            {
-                strncpy((*(client + i)).numStaff, "Over 100", 25);
-            }
-
-            //Area Of Sales
-            if (areaOfSales == 1)
-            {
-                strncpy((*(client + i)).areaOfSales, "ICT", 25);
-            }
-            else if (areaOfSales == 2)
-            {
-                strncpy((*(client + i)).areaOfSales, "Medical Devices", 25);
-            }
-            else
-            {
-                strncpy((*(client + i)).areaOfSales, "Other ", 25);
-            }
-
-            //Average Turnover
-            if (avTurn == 1)
-            {
-                strncpy((*(client + i)).averTurnOver, "Less than 1 Million", 25);
-            }
-            else if (avTurn == 2)
-            {
-                strncpy((*(client + i)).averTurnOver, "Less than 10 Million", 25);
-            }
-            else
-            {
-                strncpy((*(client + i)).averTurnOver, "Over 10 Million", 25);
-            }
-
             printf("\nSucess!");
-            printf("\nUser has been updated!");
+            printf("\nTaking you back to menu");
 
-           
-            Menu(client, statsGen);
+            Menu(client);
         }
     }
 }
-
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
 
 // Option 5
 //Delete User
-void DeleteUser(company* client, data statsGen)
+void DeleteUser(company* client)
 {
-    //Declare Variables
     int reg;
+    int check;
 
-    printf("Please Enter Reg Number of Company you wish to Delete: ");
+    printf("To delete a company, enter its register number: ");
     scanf("%d", &reg);
 
-    //look for matching register
-    for (int i = 0; i < 100; i++)
-    {
-        if ((*(client + i)).regisNum == reg)
-        {
-            //Register Number
-            (*(client + i)).regisNum = -1;
+    printf("Are you sure you wish to delete company %d? (1 for yes, 0 for no)", reg);
+    //printf("");
+    scanf("%d", &check);
 
-            //Resetting them all back All
-            strncpy((*(client + i)).name, "", 30);
-            strncpy((*(client + i)).country, "", 30);
-            (*(client + i)).yearFounded = 0;
-            strncpy((*(client + i)).email, "", 30);
-            strncpy((*(client + i)).contactName, "", 30);
-            strncpy((*(client + i)).averTurnOver, "", 30);
-            strncpy((*(client + i)).areaOfSales, "", 30);
-            strncpy((*(client + i)).numStaff, "", 30);
-            strncpy((*(client + i)).regVat, "", 5);
-            (*(client + i)).lastOrder = 0.0;
-            (*(client + i)).numOfEmployees = 0;
-            (*(client + i)).averAnnualOrder = 0.0;
-            (*(client + i)).data = 0;
-            (*(client + i)).choiceOne = 0;
-            (*(client + i)).optionTwo = 0;
-        
+    //look for matching register
+    for (int i = 0; i < 50; i++)
+    {
+        if ((*(client + i)).regisNum == reg && check == 1)
+        {
+            //reg number
+            (*(client + i)).regisNum = -1;
+            //Only resetting this as this will tell the computer that its ready to be used and overwrite
+            //the existing data saved
+
+
             printf("\nSuccess!");
             printf("\nUser Has Been Deleted!");
 
-            Menu(client, statsGen);
+            Menu(client);
         }
     }
+
+    printf("!Error, client not found");
+
+    Menu(client);
 }
-
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
 
 // Option 6
 //Generate Statistics 
-void MakeData(company* client, data statsGen)
+void MakeData(company* client)
 {
-    //Variables
     int choice;
-    int numE;
-    int areaOfSales;
+    int employ;
+    int sector;
     int count = 0;
-    
-    int a = 0, b = 0, c = 0;
-
-    int lessOneMil, lessTenMil, overTenMil;
+    int oneMil = 0;
+    int tenMil = 0;
+    int overTenMil = 0;
+    int perc1Mil;
+    int perc10Mil;
+    int percOver;
 
     //choose an option
-    printf("Would you like data done by 1: Area of Company or 2: Number of Employees");
+    printf("Display data by 1 for Sector or 2 for amount of employees");
     scanf("%d", &choice);
-    statsGen.choiceOne = choice;
 
-
+    //area
     if (choice == 1)
     {
-        //setting to 0
-        a = 0;
-        b = 0;
-        c = 0;
-        count = 0;
+        printf("Choose 1 for ICT 2 for medical devices 3 for other");
+        scanf("%d", &sector);
 
-        printf("Choose 1: ICT 2: Medical Devices 3: Other");
-        scanf("%d", &areaOfSales);
-        statsGen.options = areaOfSales;
-
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 50; i++)
         {
             if ((*(client + i)).regisNum != -1)
             {
-                if ((*(client + i)).choiceOne == areaOfSales)
+                //printf("%d", (*(client + i)).sector);
+                if ((*(client + i)).sector == sector)
                 {
+                    //update counter
                     count++;
 
-                    switch ((*(client + i)).data)
+                    if ((*(client + i)).averageT == 1)
                     {
-                    case 1:
-                        a++;
-                        break;
-                    case 2:
-                        b++;
-                        break;
-                    case 3:
-                        c++;
-                        break;
-                    default:
-                        break;
+                        oneMil++;
+                    }
+                    else if ((*(client + i)).averageT == 2)
+                    {
+                        tenMil++;
+                    }
+                    else if ((*(client + i)).averageT == 3)
+                    {
+                        overTenMil++;
                     }
                 }
             }
         }
     }
 
-    //Number Of Employees
+    //employees
     if (choice == 2)
     {
-        //Setting to 0
-        a = 0;
-        b = 0;
-        c = 0;
-        count = 0;
+        printf("Choose 1 for Less than 10 2 for Less than 100 3 for More than 100");
+        scanf("%d", &employ);
 
-        printf("Choose 1: Less than 10 Million 2: Less than 100 Million 3: More than 100 Million");
-        scanf("%d", &numE);
-        statsGen.options = numE;
-
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 50; i++)
         {
             if ((*(client + i)).regisNum != -1)
             {
-                if ((*(client + i)).optionTwo == numE)
+                if ((*(client + i)).numStaff == employ)
                 {
                     count++;
-
-                    switch ((*(client + i)).data)
+                    if ((*(client + i)).averageT == 1)
                     {
-                    case 1:
-                        a++;
-                        break;
-                    case 2:
-                        b++;
-                        break;
-                    case 3:
-                        c++;
-                        break;
-                    default:
-                        break;
+                        oneMil++;
+                    }
+                    else if ((*(client + i)).averageT == 2)
+                    {
+                        tenMil++;
+                    }
+                    else if ((*(client + i)).averageT == 3)
+                    {
+                        overTenMil++;
                     }
                 }
             }
@@ -860,91 +767,155 @@ void MakeData(company* client, data statsGen)
     }
 
     //The maths behind the stats
-    lessOneMil = (a / count) * 100;
-    lessTenMil = (b / count) * 100;
-    overTenMil = (c / count) * 100;
-
-    statsGen.lessOneMil = lessOneMil;
-    statsGen.lessTenMil = lessTenMil;
-    statsGen.overTenMil = overTenMil;
+    perc1Mil = (oneMil / count);
+    perc10Mil = (tenMil / count);
+    overTenMil = (overTenMil / count);
 
     printf("\nThe Data:");
-    printf("\nLess than 1 Million: %d %", lessOneMil);
-    printf("\nLess than 10 Million: %d %", lessTenMil);
-    printf("\nMore than 10 Million: %d %", overTenMil);
+    printf("\nLess than 1 Million: %d ", perc1Mil);
+    printf("\nLess than 10 Million: 100%", perc10Mil);
+    printf("\nMore than 10 Million: %d", overTenMil);
 
     printf("\nSucess!!");
     printf("\n\nStats Printed");
 
-    
-    Menu(client, statsGen);
-}
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
+    Menu(client);
+}
 
 //Option 7
 //Print User deatials to File
-void PrintDetsFile(company* client, data statsGen)
+void PrintDetsFile(company* client)
 {
-    //varibles
     int test = 3;
-    
-    //Creating Object of File
-    FILE* newFile;
-    FILE* data;
 
-    //File open
-    newFile = fopen("Clients.txt", "a");
+    //File
+    FILE* newFile;
+
+    newFile = fopen("clients.txt", "w");
 
     //Writing to File
-    for (int j = 0; j < 100; j++)
+    for (int j = 0; j < 50; j++)
     {
         if ((*(client + j)).regisNum != -1)
         {
-            
-            fprintf(newFile, "%d %s %s %d %s ", (*(client + j)).regisNum, (*(client + j)).name, (*(client + j)).country, (*(client + j)).yearFounded, (*(client + j)).email);
-            fprintf(newFile, "%s %.2f %d %.2f ", (*(client + j)).contactName, (*(client + j)).lastOrder, (*(client + j)).numOfEmployees, (*(client + j)).averAnnualOrder);
-            fprintf(newFile, "%s %s %s %s ", (*(client + j)).regVat, (*(client + j)).averTurnOver, (*(client + j)).numStaff, (*(client + j)).areaOfSales);
-            fprintf(newFile, "%d %d %d\n", (*(client + j)).data, (*(client + j)).choiceOne, (*(client + j)).optionTwo);
+
+            fprintf(newFile, "%d ", (*(client + j)).regisNum);
+            fprintf(newFile, "%s ", (*(client + j)).name);
+            fprintf(newFile, "%s ", (*(client + j)).country);
+            fprintf(newFile, "%d ", (*(client + j)).yearF);
+            fprintf(newFile, "%s ", (*(client + j)).email);
+            fprintf(newFile, "%s ", (*(client + j)).contactName);
+            fprintf(newFile, "%.2f ", (*(client + j)).lastOrder);
+            fprintf(newFile, "%d ", (*(client + j)).numOfEmployees);
+            fprintf(newFile, "%d ", (*(client + j)).vatRegist);
+            fprintf(newFile, "%d ", (*(client + j)).numStaff);
+            fprintf(newFile, "%d ", (*(client + j)).averageT);
+            fprintf(newFile, "%d\n", (*(client + j)).sector);
         }
     }
 
     fclose(newFile);
 
-    //Stats File
-    //Data
-    data = fopen("Stats.txt", "a");
-
-    for (int j = 0; j < 100; j++)
-    {
-        if ((*(client + j)).regisNum != -1)
-        {
-            //pritning
-            fprintf(data, "%d %d %d %d %d\n", statsGen.options, statsGen.choiceOne, statsGen.lessOneMil, statsGen.lessTenMil, statsGen.overTenMil);
-        }
-    }
-
-    //closing file
-    fclose(data);
-
-  
-    Menu(client, statsGen);
+    Menu(client);
 }
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
+//option 8
 //List by Average Turnover
-void ListUserLastAverTurnOver(company* client, data statsGen)
+void ListUserLastAverTurnOver(company* client)
 {
+    int oldest;
+    int oldestNum = 0;
+    int right = 0;
+    int first = 0;
 
+    //set first one as oldest to compare 
+    //this way it isnt 0
+    oldest = (*(client)).yearF;
 
+    for (int j = 0; j < 50; j++)
+    {
+        right = 0;
+        for (int i = 0; i < 50; i++)
+        {
+            if (oldest < (*(client + i)).yearF && (*(client + i)).regisNum != -1)
+            {
+                oldest = (*(client + i)).yearF;
+                i = i;
+                right = 1;
+            }
+        }
+        if (right == 1 || first == 0)
+        {
+            first = 1;
+
+            //print
+            printf("\nRegister number: %d", (*(client + oldestNum)).regisNum);
+            printf("\nCompany name: %s", (*(client + oldestNum)).name);
+            printf("\nCountry based in: %s", (*(client + oldestNum)).country);
+            printf("\nLast order amount: %.2f", (*(client + oldestNum)).lastOrder);
+            printf("\nStaff employed: %d", (*(client + oldestNum)).numOfEmployees);
+            printf("\nYear company founded: %d", (*(client + oldestNum)).yearF);
+            printf("\nCompany contact email: %s", (*(client + oldestNum)).email);
+            printf("\nCompany contact Name: %s", (*(client + oldestNum)).contactName);
+
+            //vat
+            printf("\nIs company vat registered: ");
+            if ((*(client + oldestNum)).vatRegist == 1)
+            {
+                printf("Yes");
+            }
+            else
+            {
+                printf("No");
+            }
+
+            //turnover
+            printf("\nAverage turnover: ");
+            if ((*(client + oldestNum)).averageT == 1)
+            {
+                printf("Less than 1 Million");
+            }
+            else if ((*(client + oldestNum)).averageT == 2)
+            {
+                printf("Less than 10 Million");
+            }
+            else
+            {
+                printf("Over 10 Million");
+            }
+
+            //employees
+            printf("\nStaff employed: ");
+            if ((*(client + oldestNum)).numStaff == 1)
+            {
+                printf("Less than 10");
+            }
+            else if ((*(client + oldestNum)).numStaff == 2)
+            {
+                printf("Less than 100");
+            }
+            else
+            {
+                printf("Over 100");
+            }
+
+            //sector
+            printf("\nCompany sector: ");
+            if ((*(client + oldestNum)).sector == 1)
+            {
+                printf("ICT");
+            }
+            else if ((*(client + oldestNum)).sector == 2)
+            {
+                printf("Medical Devices");
+            }
+            else
+            {
+                printf("Other");
+            }
+            printf("\n");
+        }
+
+    }
 }
